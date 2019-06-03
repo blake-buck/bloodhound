@@ -47,7 +47,62 @@ function firstElementGrabber(htmlString){
     return elementGrabber(htmlString) +  elementClass
 }
 
+function htmlDisplayer(matchArray){
+    console.log("Displaying the HTML of all matches")
+    for(let i = 0; i<matchArray.length; i++){
+        console.log()
+        console.log(i)
+        console.log()
+        console.log(matchArray[i].html)
+        console.log()
+        console.log()
+    }
+}
+
+async function selectorCreator(matchArray, userChoice, page){
+    let selector = '';
+                        
+    let loopController = true;
+    let elementID = matchArray[+(userChoice)].id;
+
+    while(loopController){
+
+        const query = await page.evaluate((id) => {
+
+            if(document.getElementById(id) && document.getElementById(id).parentElement){
+                return {
+                    selectorHTML: document.getElementById(id).outerHTML,
+                    parentID: document.getElementById(id).parentElement.id
+                }
+            }
+
+            else{
+                return false;
+            }
+
+        }, elementID)
+
+        if(query && query.selectorHTML && selector === ''){
+            selector = firstElementGrabber(query.selectorHTML);
+            elementID = query.parentID
+        }
+        else if(query && query.selectorHTML){
+            selector = firstElementGrabber(query.selectorHTML) + " > " + selector;
+            elementID = query.parentID
+        }
+        else{
+            loopController = false;
+        }
+                        
+
+    }
+
+    return selector;
+}
+
 module.exports={
-    elementGrabber:elementGrabber,
-    firstElementGrabber:firstElementGrabber
+    elementGrabber,
+    firstElementGrabber,
+    htmlDisplayer,
+    selectorCreator
 }
