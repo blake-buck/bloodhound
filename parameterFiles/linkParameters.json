@@ -1,5 +1,5 @@
 {
     "url":"http://books.toscrape.com/catalogue/category/books_1/index.html",
-    "linkQuery":"Tipping the Velvet",
-    "nextQuery":"next"
+    "linkQuery":["Tipping the Velvet", "standardText"],
+    "nextQuery":["next", "standardText"]
 }

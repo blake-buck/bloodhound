@@ -34,7 +34,7 @@ async function queryBuilder(parametersFile, queriesFile){
 
                 for(var t=0; t<parametersArray.length; t++){
 
-                    let parameter = blueprint[parametersArray[t]];
+                    let parameter = blueprint[parametersArray[t]][0];
                     var selector = '';
 
                     var matches = await page.evaluate((parameter, parameterTitle)=>{
@@ -144,6 +144,4 @@ async function queryBuilder(parametersFile, queriesFile){
 
 }
 
-module.exports ={
-    queryBuilder
-}
+module.exports = queryBuilder;
