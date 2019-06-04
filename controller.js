@@ -12,7 +12,7 @@ function elementGrabber(htmlString){
     return "AN ERROR HAS OCCURED IN ELEMENT GRABBER"
 }
 
-function firstElementGrabber(htmlString){
+function elementAndSelectorGrabber(htmlString){
     let element = [];
     let elementClass ='';
 
@@ -59,7 +59,7 @@ function htmlDisplayer(matchArray){
     }
 }
 
-async function selectorCreator(matchArray, userChoice, page){
+async function queryCreator(matchArray, userChoice, page){
     let selector = '';
                         
     let loopController = true;
@@ -83,11 +83,11 @@ async function selectorCreator(matchArray, userChoice, page){
         }, elementID)
 
         if(query && query.selectorHTML && selector === ''){
-            selector = firstElementGrabber(query.selectorHTML);
+            selector = elementAndSelectorGrabber(query.selectorHTML);
             elementID = query.parentID
         }
         else if(query && query.selectorHTML){
-            selector = firstElementGrabber(query.selectorHTML) + " > " + selector;
+            selector = elementAndSelectorGrabber(query.selectorHTML) + " > " + selector;
             elementID = query.parentID
         }
         else{
@@ -102,7 +102,7 @@ async function selectorCreator(matchArray, userChoice, page){
 
 module.exports={
     elementGrabber,
-    firstElementGrabber,
+    elementAndSelectorGrabber,
     htmlDisplayer,
-    selectorCreator
+    queryCreator
 }

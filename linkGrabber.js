@@ -2,28 +2,31 @@ const fs = require('fs');
 const puppeteer = require('puppeteer');
 const readline = require('readline-sync');
 
+//takes in query and parameter file, spits out a list of links
 
-async function linkGrabber(linkQueriesFile, linkParametersFile){
+async function linkGrabber(linkQueriesFile, linkParametersFile, nameOfLinksFile, numberOfPagesToScrape){
 
     (async () => {
-        await fs.readFile(linkParametersFile, 'utf8', (err, readParameters) => {
-
-            await fs.readFile('./queryFiles/linkQueries.json', 'utf8', (err2, readQueries) => {
-                const queries = JSON.parse(readQueries);
-                const parameters = JSON.parse(readParameters)
+        fs.readFile(linkParametersFile, 'utf8', (err, unparsedParameters) => {
+            
+            fs.readFile(linkQueriesFile, 'utf8', (err2, unparsedQueries) => {
+                const parsedQueries = JSON.parse(unparsedQueries);
+                const parsedParameters = JSON.parse(unparsedParameters)
                 
                 if (err) {
                     console.log('ERROR READING PARAMETERS');
+                    console.log(err);
                 }
                 else if(err2){
                     console.log("ERROR READING QUERIES")
+                    console.log(err2);
                 }
                 else {
                     (async () => {
-                    const url = parameters.url;
+                    const url = parsedParameters.url;
 
-                    const linkQuery = queries.linkQuery
-                    const nextQuery = queries.nextQuery;
+                    const linkQuery = parsedQueries.linkQuery
+                    const nextPageButtonQuery = parsedQueries.nextQuery;
                     
                     let masterList = []
 
@@ -31,31 +34,38 @@ async function linkGrabber(linkQueriesFile, linkParametersFile){
                     const page = await browser.newPage();
                     await page.goto(url);
 
-                    let isNextPage = true;
+                    let nextPageButtonExists = true;
+                    let scrapedPagesCount = 0;
 
-                    while (isNextPage) {
-                        var linksToScrape = await page.evaluate((linkQuery) => {
+                    
+                    // if numberOfPagesToScrape is -1 then the scraper will keep collecting links until it reaches the end of the line
+                    while (nextPageButtonExists && (numberOfPagesToScrape === -1 || scrapedPagesCount < numberOfPagesToScrape)) {
+                        var currentPageLinks = await page.evaluate((linkQuery) => {
+                            
                             let nodeList = document.querySelectorAll(linkQuery);
-                            let links = []
+                            let currentPageLinkList = []
+
                             for (let i = 0; i < nodeList.length; i++) {
-                                links.push(nodeList.item(i).href)
+                                currentPageLinkList.push(nodeList.item(i).href)
                             }
-                            return links;
+
+                            return currentPageLinkList;
+
                         }, linkQuery)
 
-                        linksToScrape.map(val => {
+                        currentPageLinks.map(val => {
                             masterList.push(val)
                         })
 
-                        isNextPage = await page.$(nextQuery);
-                        if (isNextPage) {
-                            await page.click(nextQuery)
+                        scrapedPagesCount++;
+
+                        nextPageButtonExists = await page.$(nextPageButtonQuery);
+                        if (nextPageButtonExists) {
+                            await page.click(nextPageButtonQuery)
                         }
                     }
 
-                    console.log(masterList)
-
-                    fs.writeFile('links.json', JSON.stringify(masterList), (err) => {
+                    fs.writeFile(`./linkFiles/${nameOfLinksFile}`, JSON.stringify(masterList), (err) => {
                         if (err) {
                             console.log('errror writing file');
                         }
@@ -70,3 +80,5 @@ async function linkGrabber(linkQueriesFile, linkParametersFile){
     })();
 
 }
+
+module.exports = linkGrabber;
