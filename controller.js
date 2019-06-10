@@ -15,12 +15,12 @@ function elementGrabber(htmlString){
 function elementAndSelectorGrabber(htmlString){
     let element = [];
     let elementClass ='';
-
+    let elementID = '';
 
     let closingBracketPosition = htmlString.search('>');
     let shortHtmlString = htmlString.slice(0, closingBracketPosition);
     let classPosition = shortHtmlString.search('class="')
-
+    let idPosition = shortHtmlString.search('id="')
 
 
     let htmlArray = shortHtmlString.split('');
@@ -41,10 +41,26 @@ function elementAndSelectorGrabber(htmlString){
             }
         }
     }
-
     elementClass += element.join('');
 
-    return elementGrabber(htmlString) +  elementClass
+    element=[]
+
+    if(idPosition > -1 && shortHtmlString.search('id="unique') === -1){
+        elementID = '#';
+        for(let i = classPosition + 4; i< htmlArray.length; i++){
+
+            if(htmlArray[i] === '"' || htmlArray[i] === "'"){
+                break;
+            }
+            else{
+                element.push(htmlArray[i]);
+            }
+        }
+    }
+
+    elementID += element.join('')
+
+    return elementGrabber(htmlString) + elmentID +  elementClass
 }
 
 function htmlDisplayer(matchArray){
