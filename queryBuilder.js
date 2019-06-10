@@ -135,7 +135,7 @@ async function queryBuilder(parametersFile, nameOfQueriesFile){
 
                 
                 
-                fs.writeFile(`./queryFiles/${nameOfQueriesFile}`, JSON.stringify(queriesFile), (err)=>{
+                fs.writeFile(`./queryFiles/${nameOfQueriesFile}.json`, JSON.stringify(queriesFile), (err)=>{
                     if(err){
                         console.log('errror writing file');
                     }
